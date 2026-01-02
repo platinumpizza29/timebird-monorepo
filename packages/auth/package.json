@@ -1,0 +1,25 @@
+{
+  "name": "@timebird/auth",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {},
+  "devDependencies": {
+    "typescript": "catalog:",
+    "@timebird/config": "workspace:*"
+  },
+  "dependencies": {
+    "better-auth": "catalog:",
+    "@better-auth/expo": "catalog:",
+    "dotenv": "catalog:",
+    "zod": "catalog:",
+    "@timebird/env": "workspace:*",
+    "@timebird/db": "workspace:*"
+  }
+}

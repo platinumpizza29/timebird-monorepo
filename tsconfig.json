@@ -1,0 +1,3 @@
+{
+  "extends": "@timebird/config/tsconfig.base.json"
+}
