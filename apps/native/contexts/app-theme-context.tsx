@@ -1,10 +1,12 @@
-import React, { createContext, useCallback, useContext, useMemo } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { useColorScheme } from "react-native";
 import { Uniwind, useUniwind } from "uniwind";
 
-type ThemeName = "light" | "dark";
+type ThemeName = "light" | "dark" | "system";
 
 type AppThemeContextType = {
   currentTheme: string;
+  preferredTheme: ThemeName;
   isLight: boolean;
   isDark: boolean;
   setTheme: (theme: ThemeName) => void;
@@ -15,6 +17,8 @@ const AppThemeContext = createContext<AppThemeContextType | undefined>(undefined
 
 export const AppThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const { theme } = useUniwind();
+  const systemTheme = useColorScheme() ?? "light";
+  const [preferredTheme, setPreferredTheme] = useState<ThemeName>("system");
 
   const isLight = useMemo(() => {
     return theme === "light";
@@ -24,23 +28,33 @@ export const AppThemeProvider = ({ children }: { children: React.ReactNode }) =>
     return theme === "dark";
   }, [theme]);
 
+  useEffect(() => {
+    const resolvedTheme = preferredTheme === "system" ? systemTheme : preferredTheme;
+    Uniwind.setTheme(resolvedTheme);
+  }, [preferredTheme, systemTheme]);
+
   const setTheme = useCallback((newTheme: ThemeName) => {
-    Uniwind.setTheme(newTheme);
+    setPreferredTheme(newTheme);
   }, []);
 
   const toggleTheme = useCallback(() => {
-    Uniwind.setTheme(theme === "light" ? "dark" : "light");
-  }, [theme]);
+    setPreferredTheme((current) => {
+      if (current === "light") return "dark";
+      if (current === "dark") return "system";
+      return "light";
+    });
+  }, []);
 
   const value = useMemo(
     () => ({
       currentTheme: theme,
+      preferredTheme,
       isLight,
       isDark,
       setTheme,
       toggleTheme,
     }),
-    [theme, isLight, isDark, setTheme, toggleTheme],
+    [theme, preferredTheme, isLight, isDark, setTheme, toggleTheme],
   );
 
   return <AppThemeContext.Provider value={value}>{children}</AppThemeContext.Provider>;

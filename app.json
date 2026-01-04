@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "146339f5-552a-4107-8e3f-0d95e80f8e39"
+      }
+    },
+    "android": {
+      "package": "com.platinumpizza29.timebird"
+    }
+  }
+}

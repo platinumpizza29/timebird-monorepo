@@ -3,3 +3,53 @@
 @import "heroui-native/styles";
 
 @source './node_modules/heroui-native/lib';
+
+@layer theme {
+  :root {
+    @variant light {
+      --background: #FFFFFF;
+      --foreground: #141414;
+      --surface: #FFFFFF;
+      --overlay: #FFFFFF;
+      --surface-foreground: #141414;
+      --overlay-foreground: #141414;
+      --default: #FFFFFF;
+      --default-foreground: #141414;
+      --muted: #6366F1;
+      --accent: #2563EB;
+      --accent-foreground: #FFFFFF;
+      --field-background: #FFFFFF;
+      --field-foreground: #141414;
+      --field-placeholder: #6366F1;
+      --link: #2563EB;
+      --divider: #6366F1;
+      --border: #6366F1;
+      --font-normal: "Urbanist_400Regular";
+      --font-medium: "Urbanist_500Medium";
+      --font-semibold: "Urbanist_600SemiBold";
+    }
+
+    @variant dark {
+      --background: #141414;
+      --foreground: #FFFFFF;
+      --surface: #141414;
+      --overlay: #141414;
+      --surface-foreground: #FFFFFF;
+      --overlay-foreground: #FFFFFF;
+      --default: #141414;
+      --default-foreground: #FFFFFF;
+      --muted: #6366F1;
+      --accent: #2563EB;
+      --accent-foreground: #FFFFFF;
+      --field-background: #141414;
+      --field-foreground: #FFFFFF;
+      --field-placeholder: #6366F1;
+      --link: #06B6D4;
+      --divider: #6366F1;
+      --border: #6366F1;
+      --font-normal: "Urbanist_400Regular";
+      --font-medium: "Urbanist_500Medium";
+      --font-semibold: "Urbanist_600SemiBold";
+    }
+  }
+}

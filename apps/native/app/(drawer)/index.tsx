@@ -1,95 +1,110 @@
-import { Ionicons } from "@expo/vector-icons";
-import { useQuery } from "@tanstack/react-query";
-import { Card, Chip, useThemeColor } from "heroui-native";
-import { Text, View, Pressable } from "react-native";
+import { Button, Card, Chip } from "heroui-native";
+import { router } from "expo-router";
+import { Text, View } from "react-native";
+import { useEffect } from "react";
 
 import { Container } from "@/components/container";
 import { SignIn } from "@/components/sign-in";
 import { SignUp } from "@/components/sign-up";
 import { authClient } from "@/lib/auth-client";
-import { queryClient, orpc } from "@/utils/orpc";
 
-export default function Home() {
-  const healthCheck = useQuery(orpc.healthCheck.queryOptions());
-  const privateData = useQuery(orpc.privateData.queryOptions());
-  const isConnected = healthCheck?.data === "OK";
-  const isLoading = healthCheck?.isLoading;
+export default function Onboarding() {
   const { data: session } = authClient.useSession();
+  const isLoggedIn = Boolean(session?.user);
 
-  const mutedColor = useThemeColor("muted");
-  const successColor = useThemeColor("success");
-  const dangerColor = useThemeColor("danger");
-  const foregroundColor = useThemeColor("foreground");
+  useEffect(() => {
+    if (isLoggedIn) {
+      router.replace("/(drawer)/(tabs)");
+    }
+  }, [isLoggedIn]);
+
+  if (isLoggedIn) {
+    return (
+      <Container className="p-6">
+        <View className="gap-4">
+          <Text className="text-sm text-muted">Loading your dashboard...</Text>
+        </View>
+      </Container>
+    );
+  }
 
   return (
     <Container className="p-6">
-      <View className="py-4 mb-6">
-        <Text className="text-4xl font-bold text-foreground mb-2">BETTER T STACK</Text>
-      </View>
-
-      {session?.user ? (
-        <Card variant="secondary" className="mb-6 p-4">
-          <Text className="text-foreground text-base mb-2">
-            Welcome, <Text className="font-medium">{session.user.name}</Text>
+      <View className="gap-8">
+        <View className="gap-3">
+          <Text className="text-sm uppercase tracking-[3px] text-muted">
+            Time Bird
           </Text>
-          <Text className="text-muted text-sm mb-4">{session.user.email}</Text>
-          <Pressable
-            className="bg-danger py-3 px-4 rounded-lg self-start active:opacity-70"
-            onPress={() => {
-              authClient.signOut();
-              queryClient.invalidateQueries();
-            }}
-          >
-            <Text className="text-foreground font-medium">Sign Out</Text>
-          </Pressable>
-        </Card>
-      ) : null}
-
-      <Card variant="secondary" className="p-6">
-        <View className="flex-row items-center justify-between mb-4">
-          <Card.Title>System Status</Card.Title>
-          <Chip variant="secondary" color={isConnected ? "success" : "danger"} size="sm">
-            <Chip.Label>{isConnected ? "LIVE" : "OFFLINE"}</Chip.Label>
-          </Chip>
+          <Text className="text-3xl font-semibold text-foreground">
+            The shift tracker built for real workdays.
+          </Text>
+          <Text className="text-sm text-muted">
+            Log shifts fast, track overtime, and see pay period totals without
+            spreadsheets.
+          </Text>
+          {session?.user ? (
+            <Button
+              className="self-start mt-2"
+              onPress={() => router.push("/(drawer)/(tabs)")}
+            >
+              <Button.Label>Go to app</Button.Label>
+            </Button>
+          ) : (
+            <Button className="self-start mt-2">
+              <Button.Label>Create account</Button.Label>
+            </Button>
+          )}
         </View>
 
-        <Card className="p-4">
-          <View className="flex-row items-center">
-            <View
-              className={`w-3 h-3 rounded-full mr-3 ${isConnected ? "bg-success" : "bg-muted"}`}
-            />
-            <View className="flex-1">
-              <Text className="text-foreground font-medium mb-1">ORPC Backend</Text>
-              <Card.Description>
-                {isLoading
-                  ? "Checking connection..."
-                  : isConnected
-                    ? "Connected to API"
-                    : "API Disconnected"}
-              </Card.Description>
-            </View>
-            {isLoading && <Ionicons name="hourglass-outline" size={20} color={mutedColor} />}
-            {!isLoading && isConnected && (
-              <Ionicons name="checkmark-circle" size={20} color={successColor} />
-            )}
-            {!isLoading && !isConnected && (
-              <Ionicons name="close-circle" size={20} color={dangerColor} />
-            )}
+        <Card variant="secondary" className="rounded-2xl p-5">
+          <Card.Title className="mb-3">Why teams choose Time Bird</Card.Title>
+          <View className="gap-3">
+            {[
+              "Fast shift logging with break rules",
+              "Monthly, bi-weekly, or weekly pay periods",
+              "Overtime multipliers you control",
+            ].map((item) => (
+              <View key={item} className="flex-row items-center gap-2">
+                <View className="h-2 w-2 rounded-full bg-primary" />
+                <Text className="text-sm text-foreground">{item}</Text>
+              </View>
+            ))}
           </View>
         </Card>
-      </Card>
 
-      <Card variant="secondary" className="mt-6 p-4">
-        <Card.Title className="mb-3">Private Data</Card.Title>
-        {privateData && <Card.Description>{privateData.data?.message}</Card.Description>}
-      </Card>
+        <Card variant="secondary" className="rounded-2xl p-5">
+          <View className="flex-row items-center justify-between mb-3">
+            <Card.Title>Setup steps</Card.Title>
+            <Chip size="sm" variant="secondary">
+              <Chip.Label>3 mins</Chip.Label>
+            </Chip>
+          </View>
+          <View className="gap-4">
+            {[
+              { step: "Add your job", detail: "Hourly rate, pay cycle, breaks." },
+              { step: "Log your first shift", detail: "Start/end, breaks, tag." },
+              { step: "Track the period", detail: "See projected earnings." },
+            ].map((item, index) => (
+              <View key={item.step} className="flex-row gap-3">
+                <View className="h-7 w-7 rounded-full border border-muted items-center justify-center">
+                  <Text className="text-xs text-muted">{index + 1}</Text>
+                </View>
+                <View>
+                  <Text className="text-sm font-medium text-foreground">{item.step}</Text>
+                  <Text className="text-xs text-muted">{item.detail}</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+        </Card>
 
-      {!session?.user && (
-        <>
-          <SignIn />
-          <SignUp />
-        </>
-      )}
+        {!session?.user && (
+          <View className="gap-4">
+            <SignIn />
+            <SignUp />
+          </View>
+        )}
+      </View>
     </Container>
   );
 }

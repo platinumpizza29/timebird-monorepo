@@ -9,7 +9,7 @@ import { useAppTheme } from "@/contexts/app-theme-context";
 const StyledIonicons = withUniwind(Ionicons);
 
 export function ThemeToggle() {
-  const { toggleTheme, isLight } = useAppTheme();
+  const { toggleTheme, preferredTheme, isLight } = useAppTheme();
 
   return (
     <Pressable
@@ -21,7 +21,11 @@ export function ThemeToggle() {
       }}
       className="px-2.5"
     >
-      {isLight ? (
+      {preferredTheme === "system" ? (
+        <Animated.View key="system" entering={ZoomIn} exiting={FadeOut}>
+          <StyledIonicons name="phone-portrait-outline" size={20} className="text-foreground" />
+        </Animated.View>
+      ) : isLight ? (
         <Animated.View key="moon" entering={ZoomIn} exiting={FadeOut}>
           <StyledIonicons name="moon" size={20} className="text-foreground" />
         </Animated.View>
