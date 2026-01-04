@@ -14,4 +14,7 @@ export default defineConfig({
   server: {
     port: 3001,
   },
+  preview: {
+    allowedHosts: ["timebird.keyurbilgi.site"],
+  },
 });

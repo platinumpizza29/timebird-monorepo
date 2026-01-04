@@ -15,6 +15,8 @@
     "@orpc/client": "catalog:",
     "@orpc/openapi": "catalog:",
     "@orpc/zod": "catalog:",
+    "date-fns": "^3.6.0",
+    "date-fns-tz": "^3.2.0",
     "hono": "catalog:",
     "dotenv": "catalog:",
     "zod": "catalog:",

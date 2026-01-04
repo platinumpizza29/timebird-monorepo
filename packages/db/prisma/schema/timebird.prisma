@@ -1,0 +1,139 @@
+enum PayCycle {
+  weekly
+  bi_weekly
+  four_weekly
+  monthly
+}
+
+enum RoundingMode {
+  nearest
+  floor
+  ceil
+}
+
+model Job {
+  id                             String            @id @default(cuid())
+  userId                         String
+  name                           String
+  currency                       String            @default("GBP")
+  hourlyRateMinor                Int
+  contractedMinutesPerWeek       Int?
+  payCycle                       PayCycle
+  anchorWeekday                  Int?
+  anchorMonthday                 Int?
+  anchorStartDateUtc             DateTime?
+  timezone                       String            @default("Europe/London")
+  standardBreakMinutes           Int?
+  standardBreakPaid              Boolean           @default(false)
+  roundingMinutes                Int?
+  roundingMode                   RoundingMode?
+  overtimeDailyThresholdMinutes  Int?
+  overtimeWeeklyThresholdMinutes Int?
+  overtimeMultiplierBps          Int?
+  active                         Boolean           @default(true)
+  createdAt                      DateTime          @default(now())
+  updatedAt                      DateTime          @updatedAt
+
+  user          User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  shifts        Shift[]
+  worksites     Worksite[]
+  rateOverrides PayRateOverride[]
+
+  @@index([userId])
+  @@map("job")
+}
+
+model Shift {
+  id             String       @id @default(cuid())
+  jobId          String
+  userId         String
+  startUtc       DateTime
+  endUtc         DateTime
+  payableMinutes Int
+  roleTag        String?
+  siteTag        String?
+  notes          String?
+  worksiteId     String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  job      Job        @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  user     User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  breaks   ShiftBreak[]
+  worksite Worksite?  @relation(fields: [worksiteId], references: [id])
+
+  @@index([jobId])
+  @@index([userId])
+  @@index([startUtc])
+  @@map("shift")
+}
+
+model ShiftBreak {
+  id      String  @id @default(cuid())
+  shiftId String
+  minutes Int
+  paid    Boolean @default(false)
+
+  shift Shift @relation(fields: [shiftId], references: [id], onDelete: Cascade)
+
+  @@index([shiftId])
+  @@map("shift_break")
+}
+
+model Worksite {
+  id        String   @id @default(cuid())
+  jobId     String
+  name      String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  job    Job     @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  shifts Shift[]
+
+  @@unique([jobId, name])
+  @@index([jobId])
+  @@map("worksite")
+}
+
+model PayRateOverride {
+  id              String   @id @default(cuid())
+  jobId           String
+  startUtc        DateTime
+  endUtc          DateTime
+  hourlyRateMinor Int
+  reason          String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([jobId, startUtc])
+  @@map("pay_rate_override")
+}
+
+model UserSettings {
+  id                             String    @id @default(cuid())
+  userId                         String    @unique
+  currency                       String    @default("GBP")
+  hourlyRateMinor                Int?
+  contractedMinutesPerWeek       Int?
+  payCycle                       PayCycle  @default(weekly)
+  anchorWeekday                  Int?
+  anchorMonthday                 Int?
+  anchorStartDateUtc             DateTime?
+  timezone                       String    @default("Europe/London")
+  standardBreakMinutes           Int?
+  standardBreakPaid              Boolean   @default(false)
+  roundingMinutes                Int?
+  roundingMode                   RoundingMode?
+  overtimeDailyThresholdMinutes  Int?
+  overtimeWeeklyThresholdMinutes Int?
+  overtimeMultiplierBps          Int?
+  createdAt                      DateTime  @default(now())
+  updatedAt                      DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_settings")
+}

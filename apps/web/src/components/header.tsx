@@ -7,12 +7,13 @@ export default function Header() {
   const links = [
     { to: "/", label: "Home" },
     { to: "/dashboard", label: "Dashboard" },
+    { to: "/shifts", label: "Shifts" },
   ] as const;
 
   return (
     <div>
-      <div className="flex flex-row items-center justify-between px-2 py-1">
-        <nav className="flex gap-4 text-lg">
+      <div className="flex flex-col gap-2 px-2 py-2 sm:flex-row sm:items-center sm:justify-between">
+        <nav className="flex gap-3 text-sm sm:text-lg overflow-x-auto whitespace-nowrap">
           {links.map(({ to, label }) => {
             return (
               <Link key={to} to={to}>
