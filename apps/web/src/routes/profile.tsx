@@ -30,11 +30,13 @@ export const Route = createFileRoute("/profile")({
   },
 });
 
+// Normalize date input for the profile form.
 function toDateInputValue(date: Date) {
   const pad = (value: number) => String(value).padStart(2, "0");
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
 
+// Profile settings for defaults, pay cycles, and overtime rules.
 function RouteComponent() {
   const queryClient = useQueryClient();
   const [selectedJobId, setSelectedJobId] = useState<string>("");

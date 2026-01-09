@@ -7,6 +7,7 @@ import { QueryCache, QueryClient } from "@tanstack/react-query";
 import { env } from "@timebird/env/web";
 import { toast } from "sonner";
 
+// Shared React Query client with toast-on-error behavior.
 export const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: (error, query) => {
@@ -20,6 +21,7 @@ export const queryClient = new QueryClient({
   }),
 });
 
+// ORPC link configured for cookie-based auth.
 export const link = new RPCLink({
   url: `${env.VITE_SERVER_URL}/rpc`,
   fetch(url, options) {
@@ -30,6 +32,7 @@ export const link = new RPCLink({
   },
 });
 
+// Type-safe ORPC client + TanStack helpers.
 export const client: AppRouterClient = createORPCClient(link);
 
 export const orpc = createTanstackQueryUtils(client);

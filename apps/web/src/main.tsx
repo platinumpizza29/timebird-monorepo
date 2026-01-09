@@ -6,6 +6,7 @@ import Loader from "./components/loader";
 import { routeTree } from "./routeTree.gen";
 import { orpc, queryClient } from "./utils/orpc";
 
+// App entry point: wire router + query client context.
 const router = createRouter({
   routeTree,
   defaultPreload: "intent",

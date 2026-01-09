@@ -15,6 +15,7 @@ import { link, orpc } from "@/utils/orpc";
 
 import "../index.css";
 
+// Root route: global providers, header layout, and devtools.
 export interface RouterAppContext {
   orpc: typeof orpc;
   queryClient: QueryClient;

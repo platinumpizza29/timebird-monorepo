@@ -8,6 +8,7 @@ export const Route = createFileRoute("/login")({
   component: RouteComponent,
 });
 
+// Toggle between sign-up and sign-in flows.
 function RouteComponent() {
   const [showSignIn, setShowSignIn] = useState(false);
 

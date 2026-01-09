@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -37,8 +37,10 @@ function toLocalInputValue(date: Date) {
   )}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
+// Shifts page: editable shift list with weekly summaries.
 function RouteComponent() {
   const queryClient = useQueryClient();
+  const navigate = useNavigate({ from: "/shifts" });
   const [selectedJobId, setSelectedJobId] = useState<string>("");
   const [editShiftId, setEditShiftId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({
@@ -136,181 +138,191 @@ function RouteComponent() {
             <h1 className="text-2xl font-semibold">All Shifts</h1>
             <p className="text-sm text-muted-foreground">Edit, update, or remove shifts.</p>
           </div>
-          <select
-            value={selectedJobId}
-            onChange={(event) => setSelectedJobId(event.target.value)}
-            className="border-border bg-background text-foreground h-8 rounded-none border px-2 text-xs"
-          >
-            <option value="" disabled>
-              {jobListQuery.isLoading ? "Loading jobs..." : "Select job"}
-            </option>
-            {jobListQuery.data?.items.map((job) => (
-              <option key={job.jobId} value={job.jobId}>
-                {job.name}
+          <div className="flex flex-wrap items-center gap-2">
+            <Button size="sm" variant="outline" onClick={() => navigate({ to: "/calendar" })}>
+              Go to calendar
+            </Button>
+            <select
+              value={selectedJobId}
+              onChange={(event) => setSelectedJobId(event.target.value)}
+              className="border-border bg-background text-foreground h-8 rounded-none border px-2 text-xs"
+            >
+              <option value="" disabled>
+                {jobListQuery.isLoading ? "Loading jobs..." : "Select job"}
               </option>
-            ))}
-          </select>
+              {jobListQuery.data?.items.map((job) => (
+                <option key={job.jobId} value={job.jobId}>
+                  {job.name}
+                </option>
+              ))}
+            </select>
+          </div>
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
-          <Card>
-            <CardHeader className="border-b">
-              <CardTitle>Shift List</CardTitle>
-              <CardDescription>Most recent shifts for the selected job.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3 pt-4">
-              {shiftListQuery.data?.items?.length ? (
-                shiftListQuery.data.items.map((shift) => {
-                  const isEditing = editShiftId === shift.shiftId;
-                  const start = new Date(shift.startUtc);
-                  const end = new Date(shift.endUtc);
-                  return (
-                    <div
-                      key={shift.shiftId}
-                      className="flex flex-col gap-3 border-b pb-4 last:border-b-0 last:pb-0"
-                    >
-                      <div className="flex flex-wrap items-center justify-between gap-3">
-                        <div>
-                          <p className="text-sm font-medium">
-                            {start.toLocaleDateString("en-GB", {
-                              weekday: "short",
-                              day: "2-digit",
-                              month: "short",
-                            })}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {start.toLocaleTimeString("en-GB", {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}{" "}
-                            →{" "}
-                            {end.toLocaleTimeString("en-GB", {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <p className="text-sm font-medium">
-                            {formatMinutes(shift.payableMinutes)}
-                          </p>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => {
-                              setEditShiftId(isEditing ? null : shift.shiftId);
-                              setEditForm({
-                                start: toLocalInputValue(start),
-                                end: toLocalInputValue(end),
-                                breakMinutes: "",
-                                tag: shift.siteTag ?? shift.roleTag ?? "",
-                              });
-                            }}
-                          >
-                            {isEditing ? "Close" : "Edit"}
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => {
-                              if (confirm("Delete this shift?")) {
-                                deleteShift.mutate({ shiftId: shift.shiftId });
-                              }
-                            }}
-                          >
-                            Delete
-                          </Button>
-                        </div>
-                      </div>
-                      {isEditing && (
-                        <div className="grid gap-3 rounded-none border p-3">
-                          <div className="grid gap-2">
-                            <label className="text-xs font-medium">Start</label>
-                            <Input
-                              type="datetime-local"
-                              value={editForm.start}
-                              onChange={(event) =>
-                                setEditForm((prev) => ({
-                                  ...prev,
-                                  start: event.target.value,
-                                }))
-                              }
-                            />
+          <div className="grid gap-6">
+            <Card>
+              <CardHeader className="border-b">
+                <CardTitle>Shift List</CardTitle>
+                <CardDescription>Most recent shifts for the selected job.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3 pt-4">
+                {shiftListQuery.data?.items?.length ? (
+                  shiftListQuery.data.items.map((shift) => {
+                    const isEditing = editShiftId === shift.shiftId;
+                    const start = new Date(shift.startUtc);
+                    const end = new Date(shift.endUtc);
+                    return (
+                      <div
+                        key={shift.shiftId}
+                        className="flex flex-col gap-3 border-b pb-4 last:border-b-0 last:pb-0"
+                      >
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                          <div>
+                            <p className="text-sm font-medium">
+                              {start.toLocaleDateString("en-GB", {
+                                weekday: "short",
+                                day: "2-digit",
+                                month: "short",
+                              })}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {start.toLocaleTimeString("en-GB", {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}{" "}
+                              →{" "}
+                              {end.toLocaleTimeString("en-GB", {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </p>
                           </div>
-                          <div className="grid gap-2">
-                            <label className="text-xs font-medium">End</label>
-                            <Input
-                              type="datetime-local"
-                              value={editForm.end}
-                              onChange={(event) =>
-                                setEditForm((prev) => ({ ...prev, end: event.target.value }))
-                              }
-                            />
-                          </div>
-                          <div className="grid gap-2">
-                            <label className="text-xs font-medium">Unpaid break (mins)</label>
-                            <Input
-                              type="number"
-                              placeholder="30"
-                              value={editForm.breakMinutes}
-                              onChange={(event) =>
-                                setEditForm((prev) => ({
-                                  ...prev,
-                                  breakMinutes: event.target.value,
-                                }))
-                              }
-                            />
-                          </div>
-                          <div className="grid gap-2">
-                            <label className="text-xs font-medium">Role or site</label>
-                            <Input
-                              value={editForm.tag}
-                              onChange={(event) =>
-                                setEditForm((prev) => ({ ...prev, tag: event.target.value }))
-                              }
-                            />
-                          </div>
-                          <div className="flex items-center justify-end gap-2">
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-medium">
+                              {formatMinutes(shift.payableMinutes)}
+                            </p>
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => setEditShiftId(null)}
-                            >
-                              Cancel
-                            </Button>
-                            <Button
-                              size="sm"
                               onClick={() => {
-                                const breakMinutes = Number(editForm.breakMinutes || 0);
-                                updateShift.mutate({
-                                  shiftId: shift.shiftId,
-                                  patch: {
-                                    startUtc: new Date(editForm.start).toISOString(),
-                                    endUtc: new Date(editForm.end).toISOString(),
-                                    breaks:
-                                      breakMinutes > 0
-                                        ? [{ minutes: breakMinutes, paid: false }]
-                                        : [],
-                                    siteTag: editForm.tag || null,
-                                  },
+                                setEditShiftId(isEditing ? null : shift.shiftId);
+                                setEditForm({
+                                  start: toLocalInputValue(start),
+                                  end: toLocalInputValue(end),
+                                  breakMinutes: "",
+                                  tag: shift.siteTag ?? shift.roleTag ?? "",
                                 });
                               }}
                             >
-                              Save
+                              {isEditing ? "Close" : "Edit"}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => {
+                                if (confirm("Delete this shift?")) {
+                                  deleteShift.mutate({ shiftId: shift.shiftId });
+                                }
+                              }}
+                            >
+                              Delete
                             </Button>
                           </div>
                         </div>
-                      )}
-                    </div>
-                  );
-                })
-              ) : (
-                <p className="text-sm text-muted-foreground">
-                  {selectedJobId ? "No shifts logged yet." : "Select a job to view shifts."}
-                </p>
-              )}
-            </CardContent>
-          </Card>
+                        {isEditing && (
+                          <div className="grid gap-3 rounded-none border p-3">
+                            <div className="grid gap-2">
+                              <label className="text-xs font-medium">Start</label>
+                              <Input
+                                type="datetime-local"
+                                value={editForm.start}
+                                onChange={(event) =>
+                                  setEditForm((prev) => ({
+                                    ...prev,
+                                    start: event.target.value,
+                                  }))
+                                }
+                              />
+                            </div>
+                            <div className="grid gap-2">
+                              <label className="text-xs font-medium">End</label>
+                              <Input
+                                type="datetime-local"
+                                value={editForm.end}
+                                onChange={(event) =>
+                                  setEditForm((prev) => ({ ...prev, end: event.target.value }))
+                                }
+                              />
+                            </div>
+                            <div className="grid gap-2">
+                              <label className="text-xs font-medium">Unpaid break (mins)</label>
+                              <Input
+                                type="number"
+                                placeholder="30"
+                                value={editForm.breakMinutes}
+                                onChange={(event) =>
+                                  setEditForm((prev) => ({
+                                    ...prev,
+                                    breakMinutes: event.target.value,
+                                  }))
+                                }
+                              />
+                            </div>
+                            <div className="grid gap-2">
+                              <label className="text-xs font-medium">Role or site</label>
+                              <Input
+                                value={editForm.tag}
+                                onChange={(event) =>
+                                  setEditForm((prev) => ({
+                                    ...prev,
+                                    tag: event.target.value,
+                                  }))
+                                }
+                              />
+                            </div>
+                            <div className="flex items-center justify-end gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setEditShiftId(null)}
+                              >
+                                Cancel
+                              </Button>
+                              <Button
+                                size="sm"
+                                onClick={() => {
+                                  const breakMinutes = Number(editForm.breakMinutes || 0);
+                                  updateShift.mutate({
+                                    shiftId: shift.shiftId,
+                                    patch: {
+                                      startUtc: new Date(editForm.start).toISOString(),
+                                      endUtc: new Date(editForm.end).toISOString(),
+                                      breaks:
+                                        breakMinutes > 0
+                                          ? [{ minutes: breakMinutes, paid: false }]
+                                          : [],
+                                      siteTag: editForm.tag || null,
+                                    },
+                                  });
+                                }}
+                              >
+                                Save
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    {selectedJobId ? "No shifts logged yet." : "Select a job to view shifts."}
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          </div>
 
           <div className="grid gap-6">
             <Card>
@@ -323,17 +335,20 @@ function RouteComponent() {
                   </span>
                 </CardAction>
               </CardHeader>
-              <CardContent className="pt-6">
-                <div className="flex items-end gap-2">
+              <CardContent className="p-0">
+                <div className="flex h-40 w-full items-end gap-2 px-4 pb-4 pt-6">
                   {chartData.map((item) => {
                     const height = Math.max(
                       10,
                       Math.round((item.totalMinutes / maxMinutes) * 120),
                     );
                     return (
-                      <div key={item.startUtc} className="flex flex-col items-center gap-2">
+                      <div
+                        key={item.startUtc}
+                        className="flex flex-1 flex-col items-center gap-2"
+                      >
                         <div
-                          className="w-6 rounded-none bg-primary/80"
+                          className="w-full rounded-none bg-primary/80"
                           style={{ height }}
                           title={`${formatMinutes(item.totalMinutes)}`}
                         />

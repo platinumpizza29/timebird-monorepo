@@ -30,6 +30,7 @@ export const Route = createFileRoute("/dashboard")({
   },
 });
 
+// Core dashboard: create jobs, log shifts, and view summaries.
 function RouteComponent() {
   const { session } = Route.useRouteContext();
   const firstName = session.data?.user.name?.split(" ")[0] ?? "there";

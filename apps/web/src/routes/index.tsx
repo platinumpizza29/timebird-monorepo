@@ -10,6 +10,7 @@ export const Route = createFileRoute("/")({
   component: HomeComponent,
 });
 
+// Marketing-style landing page with a live API health check.
 function HomeComponent() {
   const healthCheck = useQuery(orpc.healthCheck.queryOptions());
   const apiStatus = healthCheck.isLoading

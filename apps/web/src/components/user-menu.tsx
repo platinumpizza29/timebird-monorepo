@@ -14,6 +14,7 @@ import { authClient } from "@/lib/auth-client";
 import { Button } from "./ui/button";
 import { Skeleton } from "./ui/skeleton";
 
+// Auth-aware user menu with profile + sign out actions.
 export default function UserMenu() {
   const navigate = useNavigate();
   const { data: session, isPending } = authClient.useSession();

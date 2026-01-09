@@ -3,10 +3,12 @@ import { Link } from "@tanstack/react-router";
 import { ModeToggle } from "./mode-toggle";
 import UserMenu from "./user-menu";
 
+// Top navigation bar with theme toggle and user menu.
 export default function Header() {
   const links = [
     { to: "/", label: "Home" },
     { to: "/dashboard", label: "Dashboard" },
+    { to: "/calendar", label: "Calendar" },
     { to: "/shifts", label: "Shifts" },
   ] as const;
 
